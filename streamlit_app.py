@@ -14,17 +14,20 @@ with open('model/svm_classifier.pkl', 'rb') as file:
     svm_classifier = pickle.load(file)
 
 # Judul Streamlit
-st.title('Prediksi apakah Jamur ini bisa dimakan? 🍲😋⁉')
+st.title('Prediksi Tingkat Pencemaran Udara DKI Jakarta 🌫️🌆')
 
 # Input fitur numerik
 input_features = []
 feature_names = ['pm10', 'pm25', 'so2', 'co', 'o3', 'no2', 'max']
+st.write("Masukkan nilai parameter pencemaran udara:")
 for feature in feature_names:
-    value = st.number_input(f'Masukkan nilai untuk {feature}', value=0, step=1)
+    value = st.number_input(f'{feature} (masukkan nilai)', value=0, step=1)
     input_features.append(value)
 
+# Konversi input menjadi DataFrame
 df = pd.DataFrame([input_features], columns=feature_names)
 
+# Fungsi prediksi
 def prediction(df):
     # Skala fitur numerik menggunakan Scaler yang dimuat
     scaled_data = scaler.transform(df)
@@ -38,12 +41,14 @@ def prediction(df):
     # Lakukan prediksi menggunakan model SVM
     prediction = svm_classifier.predict(features)
 
-    if prediction:
-        prediction = 'beracun ☠, jangan ya dek ya 🙅'
+    # Interpretasi hasil prediksi
+    if prediction == 1:
+        prediction = 'Tingkat Pencemaran Udara Berbahaya ⚠️'
     else:
-        prediction = 'bisa dimakan 🍲😋, gasin aja bang👍'
+        prediction = 'Tingkat Pencemaran Udara Aman ✅'
     return prediction
 
+# Tombol untuk melakukan prediksi
 if st.button("Prediksi"):
     prediction_result = prediction(df)
-    st.write('Jamur ini merupakan jamur yang', prediction_result)
+    st.write('Hasil prediksi:', prediction_result)
